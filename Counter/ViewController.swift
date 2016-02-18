@@ -66,6 +66,9 @@ class ViewController: UIViewController {
         switch key {
         case Key.Key0:
             break
+        case Key.Key5:
+            print("You pressed the \(key) key")
+            break
         default:
             print("keyPressed is unimplemented for key \(key)")
         }
