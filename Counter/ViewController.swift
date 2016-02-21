@@ -65,6 +65,7 @@ class ViewController: UIViewController {
         switch key {
         case Key.Key0:
             print("\(__FUNCTION__) is unimplemented for key \(key)")
+            break
         default:
             print("\(__FUNCTION__) is unimplemented for key \(key)")
         }
