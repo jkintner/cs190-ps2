@@ -124,31 +124,40 @@ class CPUState {
         let registerC = Register(fromDecimalString: "00000000000000")
         registers[RegId.C.rawValue] = registerC
         
-        registers[RegId.C.rawValue].nibbles[0] = registers[RegId.A.rawValue].nibbles[0]
+        registers[RegId.C.rawValue].nibbles[13] = registers[RegId.A.rawValue].nibbles[13]
         
         var cIdx = RegisterLength - 1
         var decimalIdx = 15
         var firstNonZeroIdx = 15
-        let nibbleOfSignOfExp = 11
+        let numberOfDigitsOfExp = 3
+        let nibbleOfSignOfExp = numberOfDigitsOfExp - 1
         let signOfExp = registers[RegId.A.rawValue].nibbles[nibbleOfSignOfExp]
  
-        var nibbleIdx = RegisterLength - 1
+        print(signOfExp)
+        
+        //  OMG  Do I have it all backwards?!
+        
+        var nibbleIdx = 0
 
-        while nibbleIdx > nibbleOfSignOfExp {
+        while nibbleIdx < nibbleOfSignOfExp {
             if signOfExp == 0 {
                 registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
             } else if signOfExp == 9 {
-                registers[RegId.C.rawValue].nibbles[nibbleIdx] = 9 - registers[RegId.A.rawValue].nibbles[nibbleIdx]
+                if nibbleIdx == 0 {
+                    registers[RegId.C.rawValue].nibbles[nibbleIdx] = 10 - registers[RegId.A.rawValue].nibbles[nibbleIdx]
+                }
+                else {registers[RegId.C.rawValue].nibbles[nibbleIdx] = 9 - registers[RegId.A.rawValue].nibbles[nibbleIdx]
+                }
             }
             print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx],registers[RegId.A.rawValue].nibbles[nibbleIdx],registers[RegId.B.rawValue].nibbles[nibbleIdx])
-            nibbleIdx -= 1
+            nibbleIdx += 1
         }
         
         registers[RegId.C.rawValue].nibbles[nibbleOfSignOfExp] = registers[RegId.A.rawValue].nibbles[nibbleOfSignOfExp]
         print(nibbleOfSignOfExp, registers[RegId.C.rawValue].nibbles[nibbleOfSignOfExp], registers[RegId.A.rawValue].nibbles[nibbleOfSignOfExp], registers[RegId.B.rawValue].nibbles[nibbleOfSignOfExp])
 
-        nibbleIdx = nibbleOfSignOfExp - 1
-        while nibbleIdx > 0 {
+        nibbleIdx = nibbleOfSignOfExp + 1
+        while nibbleIdx < RegisterLength - 1 {
              if registers[RegId.B.rawValue].nibbles[nibbleIdx] != 9 {
                 
                 //if cIdx > 1 {
@@ -166,7 +175,7 @@ class CPUState {
 //            registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
             print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx], registers[RegId.A.rawValue].nibbles[nibbleIdx], registers[RegId.B.rawValue].nibbles[nibbleIdx])
 
-             nibbleIdx -= 1
+             nibbleIdx += 1
         }
         print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx], registers[RegId.A.rawValue].nibbles[nibbleIdx], registers[RegId.B.rawValue].nibbles[nibbleIdx])
 
