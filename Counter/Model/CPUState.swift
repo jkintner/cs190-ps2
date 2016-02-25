@@ -117,10 +117,62 @@ class CPUState {
     //
     // Make use of the enums RegisterASpecialValues and RegisterBSpecialValues so that you don't have to hard
     // code "2" to mean a decimal point (similarly for the other special values).
+
+    
+    
     func canonicalize() {
-        let registerC = Register(fromDecimalString: "01000000000002")
+        let registerC = Register(fromDecimalString: "00000000000000")
         registers[RegId.C.rawValue] = registerC
-    }
+        
+        registers[RegId.C.rawValue].nibbles[0] = registers[RegId.A.rawValue].nibbles[0]
+        
+        var cIdx = RegisterLength - 1
+        var decimalIdx = 15
+        var firstNonZeroIdx = 15
+        let nibbleOfSignOfExp = 11
+        let signOfExp = registers[RegId.A.rawValue].nibbles[nibbleOfSignOfExp]
+ 
+        var nibbleIdx = RegisterLength - 1
+
+        while nibbleIdx > nibbleOfSignOfExp {
+            if signOfExp == 0 {
+                registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
+            } else if signOfExp == 9 {
+                registers[RegId.C.rawValue].nibbles[nibbleIdx] = 9 - registers[RegId.A.rawValue].nibbles[nibbleIdx]
+            }
+            print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx],registers[RegId.A.rawValue].nibbles[nibbleIdx],registers[RegId.B.rawValue].nibbles[nibbleIdx])
+            nibbleIdx -= 1
+        }
+        
+        registers[RegId.C.rawValue].nibbles[nibbleOfSignOfExp] = registers[RegId.A.rawValue].nibbles[nibbleOfSignOfExp]
+        print(nibbleOfSignOfExp, registers[RegId.C.rawValue].nibbles[nibbleOfSignOfExp], registers[RegId.A.rawValue].nibbles[nibbleOfSignOfExp], registers[RegId.B.rawValue].nibbles[nibbleOfSignOfExp])
+
+        nibbleIdx = nibbleOfSignOfExp - 1
+        while nibbleIdx > 0 {
+             if registers[RegId.B.rawValue].nibbles[nibbleIdx] != 9 {
+                
+                //if cIdx > 1 {
+                  //  if cIdx == RegisterLength - 1 {
+                    //    firstNonZeroIdx = nibbleIdx
+                   // }
+                registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
+                   // --cIdx
+                // }
+            }
+            if registers[RegId.B.rawValue].nibbles[nibbleIdx] == 2 {
+                decimalIdx = nibbleIdx
+            }
+
+//            registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
+            print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx], registers[RegId.A.rawValue].nibbles[nibbleIdx], registers[RegId.B.rawValue].nibbles[nibbleIdx])
+
+             nibbleIdx -= 1
+        }
+        print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx], registers[RegId.A.rawValue].nibbles[nibbleIdx], registers[RegId.B.rawValue].nibbles[nibbleIdx])
+
+   }
+    
+    
     
     func decimalStringForRegister(regId: RegId) -> String {
         let register = registers[regId.rawValue]
