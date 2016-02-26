@@ -15,6 +15,9 @@
 //
 // http://www.hpmuseum.org/techcpu.htm
 
+// Really?  To do a freaking exponent??
+import Foundation
+
 typealias Nibble = UInt8 // This should be UInt4, but the smallest width unsigned integer Swift has is UInt8.
 
 typealias Pointer = UInt8 // Also should be UInt4. In any case, we are not currently using this or Status.
@@ -130,54 +133,72 @@ class CPUState {
         var decimalIdx = 15
         var firstNonZeroIdx = 15
         let numberOfDigitsOfExp = 3
+        var numberOfLeadingZeros = 0
         let nibbleOfSignOfExp = numberOfDigitsOfExp - 1
         let signOfExp = registers[RegId.A.rawValue].nibbles[nibbleOfSignOfExp]
  
-        print(signOfExp)
+       
+        var nibbleIdx = RegisterLength - 1
+        registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
         
-        //  OMG  Do I have it all backwards?!
-        
-        var nibbleIdx = 0
+        print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx], registers[RegId.A.rawValue].nibbles[nibbleIdx], registers[RegId.B.rawValue].nibbles[nibbleIdx])
 
-        while nibbleIdx < nibbleOfSignOfExp {
-            if signOfExp == 0 {
-                registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
-            } else if signOfExp == 9 {
-                if nibbleIdx == 0 {
-                    registers[RegId.C.rawValue].nibbles[nibbleIdx] = 10 - registers[RegId.A.rawValue].nibbles[nibbleIdx]
+        nibbleIdx -= 1
+        
+        while nibbleIdx > nibbleOfSignOfExp {
+            if registers[RegId.B.rawValue].nibbles[nibbleIdx] != RegisterBSpecialValues.Blank.rawValue {
+                if registers[RegId.B.rawValue].nibbles[nibbleIdx] == 2 {
+                    decimalIdx = nibbleIdx
                 }
-                else {registers[RegId.C.rawValue].nibbles[nibbleIdx] = 9 - registers[RegId.A.rawValue].nibbles[nibbleIdx]
+                if registers[RegId.A.rawValue].nibbles[nibbleIdx] == 0 {
+                    numberOfLeadingZeros += 1
+                }
+                registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
+            }
+
+            print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx], registers[RegId.A.rawValue].nibbles[nibbleIdx], registers[RegId.B.rawValue].nibbles[nibbleIdx])
+
+             nibbleIdx -= 1
+        }
+        
+        registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
+        
+        print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx], registers[RegId.A.rawValue].nibbles[nibbleIdx], registers[RegId.B.rawValue].nibbles[nibbleIdx])
+        
+        
+        let addToExpIdx = RegisterLength - 2 - decimalIdx
+ 
+        
+        var exponentA = 0
+        var powerOfTen = 0
+        nibbleIdx = 0
+        while nibbleIdx < numberOfDigitsOfExp {
+            powerOfTen = Int(pow(10.0, Double(nibbleIdx)))
+            exponentA = exponentA + powerOfTen*Int(registers[RegId.A.rawValue].nibbles[nibbleIdx])
+            nibbleIdx += 1
+        }
+        var exponentC = exponentA + addToExpIdx
+        print(exponentA, exponentC)
+                
+  
+        while nibbleIdx < numberOfDigitsOfExp {
+            if signOfExp == 0 {
+                registers[RegId.C.rawValue].nibbles[nibbleIdx] = 2 + registers[RegId.A.rawValue].nibbles[nibbleIdx]
+                if registers[RegId.C.rawValue].nibbles[nibbleIdx] > 10 {
+                    // then do something
+                }
+            } else if signOfExp == 9 {
+                if nibbleIdx != 0 {
+                    registers[RegId.C.rawValue].nibbles[nibbleIdx] = 9 - registers[RegId.A.rawValue].nibbles[nibbleIdx]
+                }
+                else {registers[RegId.C.rawValue].nibbles[nibbleIdx] = 10 - registers[RegId.A.rawValue].nibbles[nibbleIdx]
                 }
             }
             print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx],registers[RegId.A.rawValue].nibbles[nibbleIdx],registers[RegId.B.rawValue].nibbles[nibbleIdx])
-            nibbleIdx += 1
+            nibbleIdx -= 1
         }
         
-        registers[RegId.C.rawValue].nibbles[nibbleOfSignOfExp] = registers[RegId.A.rawValue].nibbles[nibbleOfSignOfExp]
-        print(nibbleOfSignOfExp, registers[RegId.C.rawValue].nibbles[nibbleOfSignOfExp], registers[RegId.A.rawValue].nibbles[nibbleOfSignOfExp], registers[RegId.B.rawValue].nibbles[nibbleOfSignOfExp])
 
-        nibbleIdx = nibbleOfSignOfExp + 1
-        while nibbleIdx < RegisterLength - 1 {
-             if registers[RegId.B.rawValue].nibbles[nibbleIdx] != 9 {
-                
-                //if cIdx > 1 {
-                  //  if cIdx == RegisterLength - 1 {
-                    //    firstNonZeroIdx = nibbleIdx
-                   // }
-                registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
-                   // --cIdx
-                // }
-            }
-            if registers[RegId.B.rawValue].nibbles[nibbleIdx] == 2 {
-                decimalIdx = nibbleIdx
-            }
-
-//            registers[RegId.C.rawValue].nibbles[nibbleIdx] = registers[RegId.A.rawValue].nibbles[nibbleIdx]
-            print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx], registers[RegId.A.rawValue].nibbles[nibbleIdx], registers[RegId.B.rawValue].nibbles[nibbleIdx])
-
-             nibbleIdx += 1
-        }
-        print(nibbleIdx, registers[RegId.C.rawValue].nibbles[nibbleIdx], registers[RegId.A.rawValue].nibbles[nibbleIdx], registers[RegId.B.rawValue].nibbles[nibbleIdx])
 
    }
     

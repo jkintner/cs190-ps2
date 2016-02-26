@@ -61,11 +61,13 @@ class CPUStateTests: XCTestCase {
     // All five examples are tested below:
     
     func testCanonicalizeSmallPositiveInteger() {
-        self.commonTestCanonicalize("01000000000002", stringB: "00029999999999", expectedC: "01000000000002")
+//        self.commonTestCanonicalize("01000000000002", stringB: "00029999999999", expectedC: "01000000000002")
+        self.commonTestCanonicalize("01000000000000", stringB: "00029999999999", expectedC: "01000000000002")
     }
     
     func testCanonicalizeSmallDecimalNumber() {
-        self.commonTestCanonicalize("00100000000902", stringB: "20099999999999", expectedC: "01000000000998")
+//        self.commonTestCanonicalize("00100000000902", stringB: "20099999999999", expectedC: "01000000000998")
+        self.commonTestCanonicalize("00100000000000", stringB: "20099999999999", expectedC: "01000000000998")
     }
     
     func testCanonicalizeLargePositiveInteger() {
